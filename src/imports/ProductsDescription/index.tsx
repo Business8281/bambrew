@@ -1,6 +1,10 @@
 import svgPaths from "./svg-4i1gpjw8v1";
 import imgHomePage11 from "./1587c80b7b2084046ff0ba8b0ba05c198b48e419.png";
 import imgLargeGreenEx1 from "./920f851acc1005431d764b263569c970a0310819.png";
+import { useParams } from 'react-router';
+import { useEffect, useState } from 'react';
+import { fetchProductByHandle } from '../../lib/shopify';
+
 
 function Frame5() {
   return (
@@ -681,11 +685,11 @@ function Frame6() {
   );
 }
 
-function Frame42() {
+function Frame42({ imageUrl }: { imageUrl?: string }) {
   return (
     <div className="absolute bg-[#e9e9e9] left-[128px] overflow-clip size-[582px] top-[220px]">
       <div className="absolute left-[-2px] size-[584px] top-[-2px]" data-name="Large Green ex 2">
-        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgLargeGreenEx1} />
+        <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imageUrl || imgLargeGreenEx1} />
       </div>
     </div>
   );
@@ -1546,6 +1550,24 @@ function Frame26() {
 }
 
 export default function ProductsDescription() {
+  const { id } = useParams();
+  const [product, setProduct] = useState<any>(null);
+
+  useEffect(() => {
+    if (id) {
+      fetchProductByHandle(id).then(setProduct);
+    }
+  }, [id]);
+
+  if (!product) {
+    return <div className="h-screen w-full flex items-center justify-center text-2xl font-bold bg-white text-black">Loading Product...</div>;
+  }
+
+  const imageUrl = product.images?.edges?.[0]?.node?.url;
+  const title = product.title;
+  const price = product.priceRange?.minVariantPrice?.amount;
+  const description = product.description;
+
   return (
     <div className="bg-white relative size-full" data-name="Products description">
       <Frame5 />
@@ -1556,7 +1578,7 @@ export default function ProductsDescription() {
       </div>
       <Frame35 />
       <Frame6 />
-      <Frame42 />
+      <Frame42 imageUrl={imageUrl} />
       <div className="absolute flex h-[37px] items-center justify-center left-[108px] top-[492px] w-[36.647px]">
         <div className="flex-none rotate-90">
           <Frame43 />
@@ -1568,17 +1590,16 @@ export default function ProductsDescription() {
         </div>
       </div>
       <div className="-translate-x-1/2 [word-break:break-word] absolute font-['Cabinet_Grotesk:Bold',sans-serif] leading-[0] left-[1058.5px] not-italic text-[#4c4b4d] text-[0px] text-center top-[220px] whitespace-nowrap">
-        <p className="leading-[1.17] mb-0 text-[32px]">COMPOSTABLE GARBAGE BAG</p>
-        <p className="font-['Cabinet_Grotesk:Regular',sans-serif] leading-[1.17] text-[32px]">GREEN | LIME | LARGE</p>
+        <p className="leading-[1.17] mb-0 text-[32px]">{title}</p>
+        <p className="font-['Cabinet_Grotesk:Regular',sans-serif] leading-[1.17] text-[32px]">{product.category || "COMPOSTABLE GARBAGE BAG"}</p>
       </div>
       <div className="-translate-x-1/2 [word-break:break-word] absolute font-['Cabinet_Grotesk:Regular',sans-serif] leading-[0] left-[1058.5px] not-italic text-[#4c4b4d] text-[14px] text-center top-[451px] w-[427px]">
-        <p className="leading-none mb-0">Bambrew Compostable Garbage Bags are designed for everyday Indian households that want durability without plastic guilt. Made from compostable materials, these bags break down naturally in 180 days while handling wet and dry waste with confidence.</p>
-        <p className="leading-none">Unlike conventional plastic bags that linger for centuries, Bambrew bags decompose under composting conditions helping you reduce pollution without changing your routine.</p>
+        <p className="leading-[1.4] mb-0">{description}</p>
       </div>
-      <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Cabinet_Grotesk:Bold',sans-serif] leading-none left-[1058px] not-italic text-[#4c4b4d] text-[20px] text-center top-[418px] w-[488px]">Strong on waste. Gentle on the planet.</p>
+      <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Cabinet_Grotesk:Bold',sans-serif] leading-none left-[1058px] not-italic text-[#4c4b4d] text-[20px] text-center top-[418px] w-[488px]"></p>
       <p className="-translate-x-1/2 [word-break:break-word] absolute font-['Cabinet_Grotesk:Bold',sans-serif] leading-[0] left-[1058px] not-italic text-[#4c4b4d] text-[0px] text-center top-[355px] whitespace-nowrap">
         <span className="leading-none text-[40px]">₹</span>
-        <span className="leading-none text-[40px]">180</span>
+        <span className="leading-none text-[40px]">{price}</span>
       </p>
       <Container />
       <Frame4 />

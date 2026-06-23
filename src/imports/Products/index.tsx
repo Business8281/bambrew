@@ -1085,7 +1085,23 @@ function Frame75() {
   );
 }
 
-function Frame20() {
+function Frame20({ products }: { products?: any[] }) {
+  if (products && products.length > 0) {
+    return (
+      <div className="content-center flex flex-wrap gap-[87px_96px] items-start relative shrink-0 w-[1185px]">
+        {products.map((product) => (
+          <ProductCard 
+            key={product.id}
+            id={product.id}
+            handle={product.handle}
+            title={product.title}
+            price={product.priceRange?.minVariantPrice?.amount}
+            imageUrl={product.images?.edges?.[0]?.node?.url}
+          />
+        ))}
+      </div>
+    );
+  }
   return (
     <div className="content-center flex flex-wrap gap-[87px_96px] items-center relative shrink-0 w-full">
       <Frame13 />
@@ -1101,11 +1117,11 @@ function Frame20() {
   );
 }
 
-function Frame40() {
+function Frame40({ products }: { products?: any[] }) {
   return (
     <div className="-translate-x-1/2 absolute content-stretch flex flex-col gap-[52px] items-center left-[calc(50%+1.5px)] top-[2835px] w-[1183px]">
       <Frame4 />
-      <Frame20 />
+      <Frame20 products={products} />
     </div>
   );
 }
@@ -2055,7 +2071,7 @@ function Frame3() {
   );
 }
 
-function Products1() {
+function Products1({ products }: { products?: any[] }) {
   return (
     <div className="bg-white h-[8438px] overflow-clip relative shrink-0 w-[1440px]" data-name="Products">
       <Frame32 />
@@ -2069,7 +2085,7 @@ function Products1() {
         <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgHomePage11} />
       </div>
       <Group />
-      <Frame40 />
+      <Frame40 products={products} />
       <Frame80 />
       <Frame97 />
       <Frame114 />
@@ -2079,10 +2095,28 @@ function Products1() {
   );
 }
 
+import { useEffect, useState } from 'react';
+import { fetchProducts } from '../../lib/shopify';
+import ProductCard from '../../app/components/ProductCard';
+
 export default function Products() {
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const data = await fetchProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to load products", error);
+      }
+    }
+    loadProducts();
+  }, []);
+
   return (
-    <div className="content-stretch flex items-center relative size-full" data-name="Products">
-      <Products1 />
+    <div className="content-stretch flex flex-col items-center relative size-full bg-white" data-name="Products">
+      <Products1 products={products} />
     </div>
   );
 }
